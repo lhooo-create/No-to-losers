@@ -1,0 +1,48 @@
+body{
+  margin:0;
+  padding:0;
+  background:#0e0e0e;
+  font-family:'Segoe UI',sans-serif;
+  color:#fff;
+  text-align:center;
+}
+h1{margin:20px 0;color:#00ff88}
+.game-container{
+  position:relative;
+  width:800px;
+  height:500px;
+  max-width:90%;
+  margin:auto;
+  background:#1c1c1c;
+  border:2px solid #333;
+  overflow:hidden;
+}
+.player{
+  width:40px;height:40px;
+  background:#ff0;
+  position:absolute;
+  bottom:0;left:50px;
+}
+.key{
+  width:30px;height:30px;
+  background:gold;
+  position:absolute;
+  left:700px;bottom:10px;
+}
+.door{
+  width:60px;height:80px;
+  background:#444;
+  position:absolute;
+  right:10px;bottom:0;
+}
+#controls{
+  margin-top:10px;
+}
+.btn{
+  background:#0af;
+  border:none;color:#fff;
+  padding:15px 20px;
+  margin:0 5px;
+  border-radius:8px;
+  font-size:18px;
+}

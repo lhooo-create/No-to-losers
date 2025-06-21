@@ -1,110 +1,48 @@
 
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const player = document.getElementById('player');
+const key = document.getElementById('key');
+const door = document.getElementById('door');
 
-let player = { x: 50, y: 380, width: 40, height: 40, color: 'yellow', vy: 0, onGround: false };
-let gravity = 1;
-let keys = { left: false, right: false };
+let posX = 50;
+let posY = 0;
+let vy = 0;
+let onGround = false;
+const gravity = 1;
+const groundY = 0;
 
-let obstacles = [{ x: 300, y: 420, width: 80, height: 20 }, { x: 500, y: 400, width: 100, height: 20 }];
-let keyItem = { x: 700, y: 420, width: 20, height: 20, taken: false };
-let door = { x: 750, y: 380, width: 40, height: 100 };
+function moveLeft(){posX -= 10; update();}
+function moveRight(){posX += 10; update();}
+function jump(){if(onGround){vy = 15; onGround=false;}}
 
-function drawPlayer() {
-  ctx.fillStyle = player.color;
-  ctx.fillRect(player.x, player.y, player.width, player.height);
-}
+function update(){
+  // apply gravity
+  vy -= gravity;
+  posY -= vy;
+  if(posY < 0){posY = 0; vy = 0; onGround = true;}
 
-function drawObstacles() {
-  ctx.fillStyle = 'red';
-  for (let obs of obstacles) {
-    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-  }
-}
+  // update player position
+  player.style.left = posX + 'px';
+  player.style.bottom = posY + 'px';
 
-function drawKey() {
-  if (!keyItem.taken) {
-    ctx.fillStyle = 'gold';
-    ctx.fillRect(keyItem.x, keyItem.y, keyItem.width, keyItem.height);
-  }
-}
-
-function drawDoor() {
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(door.x, door.y, door.width, door.height);
-}
-
-function moveLeft() {
-  keys.left = true;
-  player.x -= 10;
-}
-
-function moveRight() {
-  keys.right = true;
-  player.x += 10;
-}
-
-function jump() {
-  if (player.onGround) {
-    player.vy = -15;
-    player.onGround = false;
-  }
-}
-
-function update() {
-  player.vy += gravity;
-  player.y += player.vy;
-
-  if (player.y + player.height >= canvas.height) {
-    player.y = canvas.height - player.height;
-    player.vy = 0;
-    player.onGround = true;
+  // collision with key
+  const pRect = player.getBoundingClientRect();
+  const kRect = key.getBoundingClientRect();
+  if(!key.dataset.taken && pRect.left < kRect.right && pRect.right > kRect.left &&
+     pRect.bottom > kRect.top && pRect.top < kRect.bottom){
+      key.dataset.taken = 'yes';
+      key.style.display = 'none';
+      alert('🔑 خديت المفتاح!');
   }
 
-  // collision with obstacles
-  for (let obs of obstacles) {
-    if (player.x < obs.x + obs.width &&
-        player.x + player.width > obs.x &&
-        player.y + player.height > obs.y &&
-        player.y < obs.y + obs.height) {
-      player.y = obs.y - player.height;
-      player.vy = 0;
-      player.onGround = true;
-    }
-  }
-
-  // key pickup
-  if (!keyItem.taken &&
-      player.x < keyItem.x + keyItem.width &&
-      player.x + player.width > keyItem.x &&
-      player.y < keyItem.y + keyItem.height &&
-      player.y + player.height > keyItem.y) {
-    keyItem.taken = true;
-  }
-
-  // door
-  if (keyItem.taken &&
-      player.x < door.x + door.width &&
-      player.x + player.width > door.x &&
-      player.y < door.y + door.height &&
-      player.y + player.height > door.y) {
-    alert("🏆 فزت! مبروك يا بطل");
-    player.x = 50; keyItem.taken = false;
+  // collision with door
+  const dRect = door.getBoundingClientRect();
+  if(key.dataset.taken && pRect.left < dRect.right && pRect.right > dRect.left &&
+     pRect.bottom > dRect.top && pRect.top < dRect.bottom){
+      alert('🏆 فزت! مبروك يا بطل');
+      // reset
+      key.dataset.taken='';
+      key.style.display='block';
+      posX = 50; posY = 0;
   }
 }
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawPlayer();
-  drawObstacles();
-  drawKey();
-  drawDoor();
-}
-
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
-
-gameLoop();
+update();
